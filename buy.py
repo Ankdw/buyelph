@@ -1,6 +1,5 @@
 from flask import Flask, request, jsonify
 import logging
-import os
 
 app = Flask(__name__)
 
@@ -28,10 +27,6 @@ def main():
     logging.info(f'Response: {response!r}')
     return jsonify(response)
 
-@app.route('/', methods=['GET'])
-def health_check():
-    return 'OK', 200
-
 def handle_dialog(req, res):
     user_id = req['session']['user_id']
     
@@ -47,12 +42,8 @@ def handle_dialog(req, res):
         res['response']['buttons'] = get_suggests(user_id)
         return
     
-    if req['request']['original_utterance'].lower() in [
-        'ладно',
-        'куплю',
-        'покупаю',
-        'хорошо'
-    ]:
+    user_utterance = req['request']['original_utterance'].lower()
+    if user_utterance in ['ладно', 'куплю', 'покупаю', 'хорошо']:
         res['response']['text'] = 'Слона можно найти на Яндекс.Маркете!'
         res['response']['end_session'] = True
         return
@@ -81,5 +72,4 @@ def get_suggests(user_id):
     return suggests
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='0.0.0.0', port=5000)
